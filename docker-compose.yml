@@ -1,0 +1,79 @@
+services:
+    backend:
+        build:
+            context: './backend/docker/local'
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: 'orthoplex-8.4'
+        container_name: orthoplex-backend
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        ports:
+            - '${APP_PORT:-80}:80'
+            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+            - '${XDEBUG_PORT:-9003}'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            XDEBUG_MODE: '${XDEBUG_MODE:-off}'
+            XDEBUG_CONFIG: '${XDEBUG_CONFIG:-client_host=host.docker.internal}'
+            IGNITION_LOCAL_SITES_PATH: '${PWD}'
+        volumes:
+            - './backend:/var/www/html'
+        networks:
+            - orthoplex
+        depends_on:
+            - mysql
+            - redis
+    mysql:
+        image: 'mysql/mysql-server:8.0'
+        container_name: orthoplex-mysql
+        ports:
+            - '${FORWARD_DB_PORT:-3306}:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-password}'
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: '${DB_DATABASE:-central}'
+            MYSQL_USER: '${DB_USERNAME:-orthoplex}'
+            MYSQL_PASSWORD: '${DB_PASSWORD:-password}'
+        volumes:
+            - 'orthoplex-mysql:/var/lib/mysql'
+#            - './docker/local/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+        networks:
+            - orthoplex
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+            retries: 3
+            timeout: 5s
+    redis:
+        image: 'redis:alpine'
+        container_name: orthoplex-redis
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'orthoplex-redis:/data'
+        networks:
+            - orthoplex
+        healthcheck:
+            test: [ "CMD", "redis-cli", "ping" ]
+            retries: 3
+            timeout: 5s
+    mailhog:
+        image: 'mailhog/mailhog:latest'
+        container_name: orthoplex-mailhog
+        ports:
+            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - orthoplex
+networks:
+    orthoplex:
+        name: orthoplex-network
+        driver: bridge
+volumes:
+    orthoplex-mysql:
+        name: orthoplex-mysql
+        driver: local
+    orthoplex-redis:
+        name: orthoplex-redis
+        driver: local
