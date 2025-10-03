@@ -1,0 +1,2773 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Orthoplex API",
+        "description": "A Laravel 12 multi-tenant SaaS API with comprehensive authentication, RBAC, and user management.",
+        "contact": {
+            "email": "support@orthoplex.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://orthoplex.test",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/central/auth/login": {
+            "post": {
+                "tags": [
+                    "Central - Auth"
+                ],
+                "summary": "Central admin login",
+                "description": "Login for central application administrators",
+                "operationId": "ea655276e1a2b12ae14368b0c3eaea1c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@system.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login successful"
+                                        },
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/v1/central/auth/me": {
+            "get": {
+                "tags": [
+                    "Central - Auth"
+                ],
+                "summary": "Get authenticated central user",
+                "description": "Get details of the authenticated central user",
+                "operationId": "16505068735d3925767fac73172a0fb6",
+                "responses": {
+                    "200": {
+                        "description": "User retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/auth/logout": {
+            "post": {
+                "tags": [
+                    "Central - Auth"
+                ],
+                "summary": "Central admin logout",
+                "description": "Logout from central application",
+                "operationId": "896c0c1022309bea1312f4b0ad079868",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Central - Auth"
+                ],
+                "summary": "Refresh JWT token",
+                "description": "Refresh the JWT token for central users",
+                "operationId": "9dc816c26a93dd39462c476b0d7f0ed0",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/system/health": {
+            "get": {
+                "tags": [
+                    "Central - System"
+                ],
+                "summary": "System health check",
+                "description": "Get comprehensive system health status",
+                "operationId": "4f90f245d8b694e9102f0c6473144958",
+                "responses": {
+                    "200": {
+                        "description": "System health retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "checks": {
+                                            "type": "object"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "datetime"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/system/info": {
+            "get": {
+                "tags": [
+                    "Central - System"
+                ],
+                "summary": "System information",
+                "description": "Get system configuration and environment info",
+                "operationId": "1fdf494f2d449b174d276ec8a865513c",
+                "responses": {
+                    "200": {
+                        "description": "System info retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/system/metrics": {
+            "get": {
+                "tags": [
+                    "Central - System"
+                ],
+                "summary": "System metrics",
+                "description": "Get system performance and usage metrics",
+                "operationId": "19257cfc3869d43bf8457b03cc7552fe",
+                "responses": {
+                    "200": {
+                        "description": "System metrics retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/system/cache/clear": {
+            "post": {
+                "tags": [
+                    "Central - System"
+                ],
+                "summary": "Clear system caches",
+                "description": "Clear application caches",
+                "operationId": "a5ab48b36b93ba5a85934eee17981708",
+                "responses": {
+                    "200": {
+                        "description": "Caches cleared successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/tenants": {
+            "get": {
+                "tags": [
+                    "Central - Tenants"
+                ],
+                "summary": "List all tenants",
+                "description": "Get paginated list of all tenants in the system (central app)",
+                "operationId": "859bf05c2aa8b4a3e1e38be9250b1016",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "RSQL filter expression",
+                        "schema": {
+                            "type": "string",
+                            "example": "status==active;created_at=gt=2024-01-01"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tenants retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Central - Tenants"
+                ],
+                "summary": "Create tenant",
+                "description": "Create a new tenant with subdomain and database",
+                "operationId": "e5082f4875b291730e81ef2ba8ffbe1e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "name"
+                                ],
+                                "properties": {
+                                    "subdomain": {
+                                        "description": "Unique username for subdomain (company.localhost)",
+                                        "type": "string",
+                                        "example": "company"
+                                    },
+                                    "name": {
+                                        "description": "Display name for the tenant",
+                                        "type": "string",
+                                        "example": "Company XYZ"
+                                    },
+                                    "manager_name": {
+                                        "description": "Admin email for the tenant manager",
+                                        "type": "string",
+                                        "example": "Manager Name"
+                                    },
+                                    "manager_email": {
+                                        "description": "Admin email for the tenant",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@company.com"
+                                    },
+                                    "manager_password": {
+                                        "description": "Admin password for the tenant",
+                                        "type": "string",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tenant created successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/tenants/{tenant}": {
+            "get": {
+                "tags": [
+                    "Central - Tenants"
+                ],
+                "summary": "Get tenant",
+                "description": "Get tenant details and statistics",
+                "operationId": "c1e8b2d12ce514d9c713fe9743e28240",
+                "parameters": [
+                    {
+                        "name": "tenant",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tenant retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Central - Tenants"
+                ],
+                "summary": "Delete tenant",
+                "description": "Delete a tenant and all its data",
+                "operationId": "6613901ac37aed73afb6749186cccd61",
+                "parameters": [
+                    {
+                        "name": "tenant",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tenant deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/central/tenants/statistics": {
+            "get": {
+                "tags": [
+                    "Central - Tenants"
+                ],
+                "summary": "Get tenant statistics",
+                "description": "Get system-wide tenant statistics",
+                "operationId": "5e3e47cc5480be780a6ba498b696f6a9",
+                "responses": {
+                    "200": {
+                        "description": "Statistics retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/analytics/overview": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Get login analytics overview",
+                "description": "Get comprehensive login analytics including totals, trends, and distributions",
+                "operationId": "af8e066b45128ed3108442db0aef22f2",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "description": "Analytics period",
+                        "schema": {
+                            "type": "string",
+                            "default": "30d",
+                            "enum": [
+                                "7d",
+                                "30d",
+                                "90d",
+                                "1y"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Analytics data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_logins": {
+                                            "type": "integer",
+                                            "example": 1250
+                                        },
+                                        "unique_users": {
+                                            "type": "integer",
+                                            "example": 89
+                                        },
+                                        "successful_logins": {
+                                            "type": "integer",
+                                            "example": 1200
+                                        },
+                                        "failed_logins": {
+                                            "type": "integer",
+                                            "example": 50
+                                        },
+                                        "success_rate": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 96
+                                        },
+                                        "daily_trends": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-01-15"
+                                                    },
+                                                    "logins": {
+                                                        "type": "integer",
+                                                        "example": 45
+                                                    },
+                                                    "unique_users": {
+                                                        "type": "integer",
+                                                        "example": 12
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "method_distribution": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "method": {
+                                                        "type": "string",
+                                                        "example": "password"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "example": 800
+                                                    },
+                                                    "percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 64
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "geographic_distribution": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "country": {
+                                                        "type": "string",
+                                                        "example": "United States"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "example": 450
+                                                    },
+                                                    "percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 36
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/analytics/security": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Get security analytics",
+                "description": "Get security-focused analytics including failed login attempts, suspicious activity",
+                "operationId": "c403c87ec55aa3180667ab3051061d95",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "description": "Analytics period",
+                        "schema": {
+                            "type": "string",
+                            "default": "30d",
+                            "enum": [
+                                "7d",
+                                "30d",
+                                "90d"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Security analytics retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_failed_attempts": {
+                                            "type": "integer",
+                                            "example": 125
+                                        },
+                                        "rate_limited_attempts": {
+                                            "type": "integer",
+                                            "example": 45
+                                        },
+                                        "suspicious_ips": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "ip_address": {
+                                                        "type": "string",
+                                                        "example": "192.168.1.100"
+                                                    },
+                                                    "failed_attempts": {
+                                                        "type": "integer",
+                                                        "example": 15
+                                                    },
+                                                    "last_attempt": {
+                                                        "type": "string",
+                                                        "format": "datetime"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "failed_by_reason": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "reason": {
+                                                        "type": "string",
+                                                        "example": "invalid_credentials"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "example": 80
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/analytics/users": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Get user behavior analytics",
+                "description": "Get user-focused analytics including activity patterns, device usage",
+                "operationId": "ac37646dec0ce2cfa52bef070ec6fa40",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "description": "Analytics period",
+                        "schema": {
+                            "type": "string",
+                            "default": "30d",
+                            "enum": [
+                                "7d",
+                                "30d",
+                                "90d"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User analytics retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Create a new user account and return JWT token",
+                "operationId": "2c293d8005a69dfe90d0ae7565baca95",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User registered successfully"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                }
+            }
+        },
+        "/api/v1/email/verification-notification": {
+            "post": {
+                "tags": [
+                    "Email Verification"
+                ],
+                "summary": "Resend verification email",
+                "description": "Send a new email verification notification to the user",
+                "operationId": "a5c7ac4c59d72c95901a4923193b9e58",
+                "responses": {
+                    "200": {
+                        "description": "Verification email sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Verification email sent successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Email already verified"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/email/verify/{id}/{hash}": {
+            "get": {
+                "tags": [
+                    "Email Verification"
+                ],
+                "summary": "Verify email address",
+                "description": "Verify the user's email address using the verification link",
+                "operationId": "48915c808a251bded2bb673be0514b04",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "hash",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expires",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "signature",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email verified successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email verified successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid verification link"
+                    },
+                    "422": {
+                        "description": "Email already verified"
+                    }
+                }
+            }
+        },
+        "/api/v1/email/verification-status": {
+            "get": {
+                "tags": [
+                    "Email Verification"
+                ],
+                "summary": "Check verification status",
+                "description": "Check if the current user's email is verified",
+                "operationId": "146ec8ecafb83416f78e0c46d7240f9a",
+                "responses": {
+                    "200": {
+                        "description": "Verification status retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "verified": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "verified_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gdpr/export": {
+            "post": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "Request data export",
+                "description": "Request a complete export of user data for GDPR compliance",
+                "operationId": "0ac1cc1f4d178d31e9f7726ca248db76",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "format": {
+                                        "type": "string",
+                                        "default": "json",
+                                        "enum": [
+                                            "json",
+                                            "csv"
+                                        ]
+                                    },
+                                    "include_deleted": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Export request created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data export request created"
+                                        },
+                                        "export_id": {
+                                            "type": "string",
+                                            "example": "exp_abc123"
+                                        },
+                                        "estimated_completion": {
+                                            "type": "string",
+                                            "format": "datetime"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many export requests"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gdpr/export/{exportId}": {
+            "get": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "Get export status",
+                "description": "Check the status of a data export request",
+                "operationId": "d7de7699e4c5a9a39cdcbb4e35c69d6a",
+                "parameters": [
+                    {
+                        "name": "exportId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Export status retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "pending",
+                                                "processing",
+                                                "completed",
+                                                "failed"
+                                            ]
+                                        },
+                                        "download_url": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "expires_at": {
+                                            "type": "string",
+                                            "format": "datetime"
+                                        },
+                                        "file_size": {
+                                            "type": "integer",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gdpr/download/{exportId}": {
+            "get": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "Download exported data",
+                "description": "Download the exported data file",
+                "operationId": "90d11527a2da6cb383392b9f0daaab74",
+                "parameters": [
+                    {
+                        "name": "exportId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File download"
+                    },
+                    "404": {
+                        "description": "Export not found or expired"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gdpr/delete": {
+            "post": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "Request account deletion",
+                "description": "Request deletion of user account and all associated data",
+                "operationId": "9a25e256488d9a00ff37f52bd4cb612d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "password",
+                                    "confirmation"
+                                ],
+                                "properties": {
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "confirmation": {
+                                        "type": "string",
+                                        "example": "DELETE MY ACCOUNT"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Deletion request created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "scheduled_deletion": {
+                                            "type": "string",
+                                            "format": "datetime"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gdpr/delete/{requestId}": {
+            "delete": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "Cancel deletion request",
+                "description": "Cancel a pending account deletion request",
+                "operationId": "dbbac1d8d4f1cdd318fc2e1448b5cb58",
+                "parameters": [
+                    {
+                        "name": "requestId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deletion request cancelled"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/magic-link": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Send magic login link",
+                "description": "Send a magic login link to the user's email address",
+                "operationId": "3879dbeb1d520c05b747093ef581be81",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Magic link sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Magic link sent to your email address"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/magic-link/verify/{token}": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify magic login link",
+                "description": "Verify magic login link and authenticate user",
+                "operationId": "4488a49b5ac226034255f63eb94aa0c2",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Authentication successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Authentication successful"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid or expired magic link"
+                    }
+                }
+            }
+        },
+        "/api/v1/2fa/enable": {
+            "post": {
+                "tags": [
+                    "Two-Factor Authentication"
+                ],
+                "summary": "Enable 2FA",
+                "description": "Enable two-factor authentication and generate QR code",
+                "operationId": "91d310aa0431954677d14733e50cb807",
+                "responses": {
+                    "200": {
+                        "description": "2FA enabled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Two-factor authentication enabled successfully"
+                                        },
+                                        "qr_code_url": {
+                                            "type": "string",
+                                            "example": "data:image/png;base64,..."
+                                        },
+                                        "secret": {
+                                            "type": "string",
+                                            "example": "ABCDEFGHIJKLMNOP"
+                                        },
+                                        "recovery_codes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "2FA already enabled"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/2fa/confirm": {
+            "post": {
+                "tags": [
+                    "Two-Factor Authentication"
+                ],
+                "summary": "Confirm 2FA setup",
+                "description": "Verify TOTP code and enable 2FA",
+                "operationId": "7ea5ca9b0e38b8acafa4cd8347cbc204",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "2FA confirmed and enabled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Two-factor authentication enabled successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid verification code"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/2fa/disable": {
+            "post": {
+                "tags": [
+                    "Two-Factor Authentication"
+                ],
+                "summary": "Disable 2FA",
+                "description": "Disable two-factor authentication",
+                "operationId": "f6c95a2c7a85bc13e23458b14c1df8ca",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "password"
+                                ],
+                                "properties": {
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "current_password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "2FA disabled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Two-factor authentication disabled successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid password or 2FA not enabled"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/2fa/status": {
+            "get": {
+                "tags": [
+                    "Two-Factor Authentication"
+                ],
+                "summary": "Get 2FA status",
+                "description": "Check if 2FA is enabled for the current user",
+                "operationId": "c5fc806173306ce2d485d0dd08de2fe9",
+                "responses": {
+                    "200": {
+                        "description": "2FA status retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "recovery_codes_count": {
+                                            "type": "integer",
+                                            "example": 8
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/2fa/recovery-codes": {
+            "post": {
+                "tags": [
+                    "Two-Factor Authentication"
+                ],
+                "summary": "Generate new recovery codes",
+                "description": "Generate new recovery codes (invalidates old ones)",
+                "operationId": "3c7badc662be46843bc4f1b9a4b4c4eb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "password"
+                                ],
+                                "properties": {
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "current_password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Recovery codes generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "New recovery codes generated"
+                                        },
+                                        "recovery_codes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "2FA not enabled or invalid password"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/2fa/verify": {
+            "post": {
+                "tags": [
+                    "Two-Factor Authentication"
+                ],
+                "summary": "Verify 2FA code",
+                "description": "Verify TOTP or recovery code during login",
+                "operationId": "453dcdb5bba3667673c072c0abae909c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    },
+                                    "recovery_code": {
+                                        "type": "string",
+                                        "example": "abcd-1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Code verified successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Two-factor authentication verified"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid code"
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List users with advanced querying",
+                "description": "Get paginated list of users with RSQL filtering, cursor pagination, and advanced sorting",
+                "operationId": "d19efc9968cc35819cb1c9b33a094ed2",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "RSQL filter expression",
+                        "schema": {
+                            "type": "string",
+                            "example": "name=like=john;email!=admin@example.com"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Global text search across name and email",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort fields (comma-separated, prefix with - for desc)",
+                        "schema": {
+                            "type": "string",
+                            "example": "name,-created_at"
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Select specific fields to return",
+                        "schema": {
+                            "type": "string",
+                            "example": "id,name,email,created_at"
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "description": "Cursor for pagination",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "description": "Pagination direction",
+                        "schema": {
+                            "type": "string",
+                            "default": "next",
+                            "enum": [
+                                "next",
+                                "prev"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include_total",
+                        "in": "query",
+                        "description": "Include total count (expensive operation)",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Filter by creation date start",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "Filter by creation date end",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Users retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "cursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next_cursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "prev_cursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "has_more": {
+                                                    "type": "boolean"
+                                                },
+                                                "limit": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "description": "Create a new user account",
+                "operationId": "867bb38a7e18614dbc341116c2c5ff01",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "timezone": {
+                                        "type": "string",
+                                        "example": "UTC"
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "example": "en"
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "member"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User created successfully"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user details",
+                "description": "Retrieve detailed information about a specific user",
+                "operationId": "05e96cbbefab19f860964d1d20a9686b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include relationships",
+                        "schema": {
+                            "type": "string",
+                            "example": "roles,permissions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user",
+                "description": "Update user information",
+                "operationId": "95a776ccb6cd959ce03e4a2a36c07012",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "timezone": {
+                                        "type": "string",
+                                        "example": "America/New_York"
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "example": "en"
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "admin"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User updated successfully"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{id}": {
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete user",
+                "description": "Soft delete a user (can be restored)",
+                "operationId": "e316536e997354eb25c630e84d7169c0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{id}/restore": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Restore deleted user",
+                "description": "Restore a soft-deleted user",
+                "operationId": "c18e3460ac1996adcfe5a87c5fedfe97",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User restored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User restored successfully"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/inactive": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get inactive users",
+                "description": "Get users who haven't logged in within the specified time window",
+                "operationId": "0644ca584d83782e796137450d4fef70",
+                "parameters": [
+                    {
+                        "name": "window",
+                        "in": "query",
+                        "description": "Time window (hour, day, week, month)",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "hour",
+                                "day",
+                                "week",
+                                "month"
+                            ],
+                            "example": "week"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inactive users retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/top-logins": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get users with most logins",
+                "description": "Get users ordered by login count within time window",
+                "operationId": "43d1ed8c2f20215b7c7793f8f3d3e5dd",
+                "parameters": [
+                    {
+                        "name": "window",
+                        "in": "query",
+                        "description": "Time window",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "7d",
+                                "30d"
+                            ],
+                            "example": "7d"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of users to return",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Top login users retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/webhooks": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "List webhooks",
+                "description": "Get paginated list of webhooks with advanced filtering",
+                "operationId": "2aa9e9009edaf4f064424d424b3bed7a",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "RSQL filter expression",
+                        "schema": {
+                            "type": "string",
+                            "example": "active==true;events=in=user.created"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Webhooks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Webhook"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Create webhook",
+                "description": "Create a new webhook endpoint",
+                "operationId": "8bfcf5d6892778b0af84f9891a8cf892",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "url",
+                                    "events"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "User Registration Hook"
+                                    },
+                                    "url": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://api.example.com/webhooks"
+                                    },
+                                    "events": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "user.created",
+                                            "user.updated"
+                                        ]
+                                    },
+                                    "secret": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "headers": {
+                                        "type": "object",
+                                        "nullable": true
+                                    },
+                                    "max_retries": {
+                                        "type": "integer",
+                                        "default": 3,
+                                        "maximum": 10,
+                                        "minimum": 0
+                                    },
+                                    "retry_delay": {
+                                        "type": "integer",
+                                        "default": 60,
+                                        "maximum": 3600,
+                                        "minimum": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Webhook created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Webhook"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/webhooks/{webhook}": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Get webhook",
+                "description": "Get webhook details by ID",
+                "operationId": "575c5890c17e0f76b43772046d04a6e7",
+                "parameters": [
+                    {
+                        "name": "webhook",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Webhook retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Webhook"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Update webhook",
+                "description": "Update webhook configuration",
+                "operationId": "61710d3e239969f292f2abfcc34f1f94",
+                "parameters": [
+                    {
+                        "name": "webhook",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "url": {
+                                        "type": "string",
+                                        "format": "url"
+                                    },
+                                    "events": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "active": {
+                                        "type": "boolean"
+                                    },
+                                    "headers": {
+                                        "type": "object"
+                                    },
+                                    "max_retries": {
+                                        "type": "integer"
+                                    },
+                                    "retry_delay": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Webhook updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Delete webhook",
+                "description": "Delete a webhook endpoint",
+                "operationId": "efe718f3bf61e800d3b188bdf6d1d536",
+                "parameters": [
+                    {
+                        "name": "webhook",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Webhook deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/webhooks/{webhook}/test": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Test webhook",
+                "description": "Send a test payload to webhook endpoint",
+                "operationId": "428d0308dc9f7a73e992ef35fdef6b08",
+                "parameters": [
+                    {
+                        "name": "webhook",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test webhook sent"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/webhooks/{webhook}/deliveries": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Get webhook deliveries",
+                "description": "Get delivery history for a webhook",
+                "operationId": "54fddb85629876cf875ced51c2eaf877",
+                "parameters": [
+                    {
+                        "name": "webhook",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deliveries retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/webhooks/events": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Get available events",
+                "description": "Get list of available webhook events",
+                "operationId": "4d6beddacc239a83d95602b86e825dd2",
+                "responses": {
+                    "200": {
+                        "description": "Events retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/webhooks/{webhook}/regenerate-secret": {
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Regenerate webhook secret",
+                "description": "Generate a new HMAC secret for webhook",
+                "operationId": "15971d9a8b57045254dda69cbb916296",
+                "parameters": [
+                    {
+                        "name": "webhook",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Secret regenerated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "title": "User",
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "email_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "last_login_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "login_count": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "google2fa_enabled": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "example": "UTC"
+                    },
+                    "locale": {
+                        "type": "string",
+                        "example": "en"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Webhook": {
+                "title": "Webhook",
+                "required": [
+                    "id",
+                    "name",
+                    "url",
+                    "events",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "User Registration Hook"
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://api.example.com/webhooks"
+                    },
+                    "events": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "user.created",
+                            "user.updated"
+                        ]
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "secret": {
+                        "type": "string",
+                        "example": "abc123..."
+                    },
+                    "max_retries": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "retry_delay": {
+                        "type": "integer",
+                        "example": 60
+                    },
+                    "last_triggered_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Central - Auth",
+            "description": "Central - Auth"
+        },
+        {
+            "name": "Central - System",
+            "description": "Central - System"
+        },
+        {
+            "name": "Central - Tenants",
+            "description": "Central - Tenants"
+        },
+        {
+            "name": "Analytics",
+            "description": "Analytics"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Email Verification",
+            "description": "Email Verification"
+        },
+        {
+            "name": "GDPR",
+            "description": "GDPR"
+        },
+        {
+            "name": "Two-Factor Authentication",
+            "description": "Two-Factor Authentication"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
+        },
+        {
+            "name": "Webhooks",
+            "description": "Webhooks"
+        }
+    ]
+}

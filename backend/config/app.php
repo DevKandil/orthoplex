@@ -56,6 +56,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Main Domain
+    |--------------------------------------------------------------------------
+    |
+    | This value is the main domain of your application. This can be used
+    | to generate URLs or for other domain-specific logic.
+    |
+    */
+
+    'domain' => env('APP_DOMAIN', 'orthoplex.test'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

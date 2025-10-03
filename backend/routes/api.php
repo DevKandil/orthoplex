@@ -1,65 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
-use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| This file now serves as a compatibility layer that includes
+| the new versioned API routes. The structure separates:
+| - Central app routes (system/tenant management)
+| - Tenant app routes (multi-tenant operations)
+|
+*/
 
-Route::group([
-    'middleware' => [
-        'api',
-        InitializeTenancyByDomain::class,
-        PreventAccessFromCentralDomains::class,
-//        'lang',
-//        'verifyApiKey'
-    ],
-    'as' => 'api.'
-], function () {
-
-    /*
-    |----------------------------------------------------------------
-    | Guest routes group
-    |----------------------------------------------------------------
-    */
-    Route::group([
-        'middleware' => ['guest'],
-        'prefix' => 'auth',
-        'as' => 'auth.'
-    ], function () {
-//        Route::post('/login', [AuthController::class, 'login'])->name('login');
-    });
-
-
-    /*
-    |----------------------------------------------------------------
-    | Auth routes group
-    |----------------------------------------------------------------
-    */
-    Route::group([
-        'middleware' => ['auth:sanctum']
-    ], function () {
-
-        /*
-         * Auth routes
-         */
-        Route::group([
-            'prefix' => 'auth',
-            'as' => 'auth.',
-        ], function () {
-//            Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-        });
-
-        /*
-         * Users
-         * This group contains routes for managing users.
-         */
-        Route::group([
-            'prefix' => 'users',
-            'as' => 'users.'
-        ], function () {
-//            Route::get('/me', [UserController::class, 'me'])->name('me');
-//            Route::post('/update', [UserController::class, 'update'])->name('update');
-        });
-
-    });
-
-});
+// Include versioned API routes
+require __DIR__ . '/api/v1/central.php';  // Central app management
+require __DIR__ . '/api/v1/tenant.php';   // Tenant-specific operations

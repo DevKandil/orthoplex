@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
+        'guard' => env('AUTH_GUARD', 'api'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -38,6 +38,10 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
+            'provider' => 'users',
+        ],
+        'api' => [
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
     ],
@@ -111,5 +115,22 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for authentication rate limiting.
+    |
+    */
+
+    'rate_limits' => [
+        'login_attempts' => env('RATE_LIMIT_LOGIN_ATTEMPTS', 5),
+        'login_decay_minutes' => env('RATE_LIMIT_LOGIN_DECAY_MINUTES', 15),
+        'magic_link_attempts' => env('RATE_LIMIT_MAGIC_LINK_ATTEMPTS', 3),
+        'magic_link_decay_minutes' => env('RATE_LIMIT_MAGIC_LINK_DECAY_MINUTES', 60),
+        'magic_link_expire_minutes' => env('MAGIC_LINK_EXPIRE_MINUTES', 15),
+    ],
 
 ];

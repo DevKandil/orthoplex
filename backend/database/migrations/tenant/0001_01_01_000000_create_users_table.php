@@ -16,9 +16,28 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('last_login_at')->nullable();
+            $table->unsignedBigInteger('login_count')->default(0);
+
+            // 2FA fields
+            $table->text('google2fa_secret')->nullable();
+            $table->boolean('google2fa_enabled')->default(false);
+            $table->text('two_factor_recovery_codes')->nullable();
+
+            // Profile fields
+            $table->string('timezone', 50)->default('UTC');
+            $table->string('locale', 10)->default('en');
+            $table->string('avatar_url')->nullable();
+
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
+
+
+            // Indexes for performance
+            $table->index(['last_login_at']);
+            $table->index(['deleted_at']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

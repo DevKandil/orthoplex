@@ -9,10 +9,14 @@
         "php": "^8.2",
         "darkaonline/l5-swagger": "^9.0",
         "laravel/framework": "^12.0",
+        "laravel/horizon": "^5.34",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "pragmarx/google2fa-laravel": "^2.3",
         "predis/predis": "^3.2",
-        "stancl/tenancy": "^3.9"
+        "spatie/laravel-permission": "^6.21",
+        "stancl/tenancy": "^3.9",
+        "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

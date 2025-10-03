@@ -10,4 +10,24 @@ use Stancl\Tenancy\Database\Concerns\HasDomains;
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains;
+
+    protected $casts = [
+        'data' => 'array',
+    ];
+
+    protected $fillable = [
+        'id',
+        'data',
+        // Virtual attributes
+        'name',
+        'email',
+        'username',
+        'created_by',
+    ];
+
+    // Define custom columns (columns that exist on the table)
+    public static function getCustomColumns(): array
+    {
+        return ['id', 'created_at', 'updated_at', 'data'];
+    }
 }
