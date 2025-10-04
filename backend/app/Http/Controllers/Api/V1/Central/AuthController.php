@@ -102,7 +102,7 @@ class AuthController extends Controller
      */
     public function me(): JsonResponse
     {
-        $user = auth()->user;
+        $user = auth()->user();
 
         return response()->json([
             'user' => [

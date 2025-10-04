@@ -48,7 +48,7 @@ Route::group([
 Route::group([
     'prefix' => 'v1/central',
     'as' => 'api.v1.central.',
-    'middleware' => ['auth:central']
+    'middleware' => ['auth:api']
 ], function () {
 
     /*

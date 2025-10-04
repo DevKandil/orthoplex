@@ -13,7 +13,7 @@ class NotReservedSubdomain implements ValidationRule
      * @var array
      */
     protected $reserved = [
-        'www', 'admin', 'mail', 'api', 'test', 'localhost', 'app', 'secure', 'blog', 'support',
+        'www', 'admin', 'mail', 'api', 'test', 'localhost', 'secure', 'blog', 'support',
     ];
 
     /**

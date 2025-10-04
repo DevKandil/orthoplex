@@ -55,41 +55,45 @@ A comprehensive Laravel 12 multi-tenant SaaS platform showcasing enterprise-grad
 
 ## 🏗️ Quick Start
 
-### 1. Clone and Setup
+### 1. Clone Repository
 
 ```bash
 git clone <repository-url> orthoplex
 cd orthoplex
-cp .env.example .env
-cp backend/.env.example backend/.env
 ```
 
-### 2. Start Development Environment
+### 2. Setup Application
 
 ```bash
-# Using Make (recommended)
-make up
-
-# Or using Docker Compose directly
-docker-compose up -d
-```
-
-### 3. Setup Application
-
-```bash
-# Using Make
 make setup
-
-# Or manually
-docker-compose exec backend php artisan app:setup
 ```
 
-### 4. Access the Application
+This will:
+- Copy environment files
+- Install Composer and NPM dependencies
+- Generate application key and JWT secret
+- Configure /etc/hosts entries
 
-- **API Documentation**: http://localhost/api/documentation
-- **Central Domain**: http://orthoplex.test (add to /etc/hosts)
-- **Mailhog**: http://localhost:8025
-- **Example Tenant**: http://tenant1.orthoplex.test
+### 3. Start Development Environment
+
+```bash
+make up
+```
+
+### 4. Run Database Migrations
+
+```bash
+make migrate
+```
+
+### 5. Access the Application
+
+- **Backend**: http://orthoplex.test
+- **API Documentation**: http://orthoplex.test/api/documentation
+- **Mailhog**: http://orthoplex.test:8025
+- **Telescope**: http://orthoplex.test:8080
+- **Horizon**: http://orthoplex.test/horizon
+- **Example Tenant**: http://app.orthoplex.test
 
 ## 🛠️ Development Commands
 
@@ -100,11 +104,11 @@ make up
 # Stop environment
 make down
 
-# Fresh setup (wipes database)
-make fresh
+# Setup application
+make setup
 
-# Access container shell
-make shell
+# Run database migrations
+make migrate
 
 # View logs
 make logs
@@ -112,14 +116,8 @@ make logs
 # Run tests
 make test
 
-# Format code
-make lint
-
 # Generate API docs
 make docs
-
-# Create test tenant
-make tenant
 ```
 
 ## 🏗️ Architecture Overview
