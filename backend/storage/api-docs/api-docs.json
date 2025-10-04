@@ -2223,22 +2223,69 @@
                 ]
             }
         },
-        "/api/webhooks": {
+        "/api/v1/webhooks": {
             "get": {
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "List webhooks",
-                "description": "Get paginated list of webhooks with advanced filtering",
-                "operationId": "2aa9e9009edaf4f064424d424b3bed7a",
+                "summary": "List all webhooks",
+                "description": "Retrieve a paginated list of all webhooks with optional filtering and sorting. Supports cursor-based pagination for efficient browsing of large datasets.",
+                "operationId": "719bf7a219f465e4495b9c75122f994c",
                 "parameters": [
                     {
-                        "name": "filter",
+                        "name": "limit",
                         "in": "query",
-                        "description": "RSQL filter expression",
+                        "description": "Number of items per page (default: 15)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Field to sort by (default: created_at)",
                         "schema": {
                             "type": "string",
-                            "example": "active==true;events=in=user.created"
+                            "default": "created_at",
+                            "example": "created_at"
+                        }
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc, default: desc)",
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "example": "desc"
+                        }
+                    },
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search webhooks by name or URL",
+                        "schema": {
+                            "type": "string",
+                            "example": "production"
+                        }
+                    },
+                    {
+                        "name": "filter[active]",
+                        "in": "query",
+                        "description": "Filter by active status (true/false)",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "true",
+                                "false"
+                            ],
+                            "example": "true"
                         }
                     }
                 ],
@@ -2254,12 +2301,42 @@
                                             "items": {
                                                 "$ref": "#/components/schemas/Webhook"
                                             }
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "example": "http://app.orthoplex.test/api/v1/webhooks"
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 15
+                                        },
+                                        "next_cursor": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "next_page_url": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "prev_cursor": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "prev_page_url": {
+                                            "type": "string",
+                                            "nullable": true
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2272,10 +2349,11 @@
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "Create webhook",
-                "description": "Create a new webhook endpoint",
-                "operationId": "8bfcf5d6892778b0af84f9891a8cf892",
+                "summary": "Create a new webhook",
+                "description": "Register a new webhook endpoint to receive real-time event notifications. The webhook will be automatically assigned a secret for HMAC signature verification if one is not provided.",
+                "operationId": "5dba243510bc37a40ce8a6b4f4fd179c",
                 "requestBody": {
+                    "description": "Webhook configuration",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -2287,43 +2365,78 @@
                                 ],
                                 "properties": {
                                     "name": {
+                                        "description": "Descriptive name for the webhook",
                                         "type": "string",
-                                        "example": "User Registration Hook"
+                                        "maxLength": 255,
+                                        "example": "Production User Events"
                                     },
                                     "url": {
+                                        "description": "HTTPS endpoint URL to receive webhook POST requests",
                                         "type": "string",
                                         "format": "url",
-                                        "example": "https://api.example.com/webhooks"
+                                        "maxLength": 2048,
+                                        "example": "https://api.example.com/webhooks/orthoplex"
                                     },
                                     "events": {
+                                        "description": "Array of event types to subscribe to",
                                         "type": "array",
                                         "items": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "enum": [
+                                                "user.created",
+                                                "user.updated",
+                                                "user.deleted",
+                                                "user.login",
+                                                "user.logout",
+                                                "user.email_verified",
+                                                "user.2fa_enabled",
+                                                "user.2fa_disabled",
+                                                "tenant.created",
+                                                "tenant.updated",
+                                                "tenant.deleted",
+                                                "webhook.test",
+                                                "gdpr.export_completed",
+                                                "gdpr.deletion_requested",
+                                                "gdpr.deletion_completed"
+                                            ]
                                         },
                                         "example": [
                                             "user.created",
-                                            "user.updated"
+                                            "user.updated",
+                                            "user.login"
                                         ]
                                     },
                                     "secret": {
+                                        "description": "Optional custom HMAC secret key (auto-generated if not provided)",
                                         "type": "string",
+                                        "maxLength": 255,
+                                        "example": "my-custom-secret-key",
                                         "nullable": true
                                     },
                                     "headers": {
+                                        "description": "Optional custom HTTP headers to include in webhook requests",
                                         "type": "object",
+                                        "example": {
+                                            "X-Custom-Header": "value",
+                                            "Authorization": "Bearer token"
+                                        },
                                         "nullable": true
                                     },
                                     "max_retries": {
+                                        "description": "Maximum number of retry attempts for failed deliveries",
                                         "type": "integer",
                                         "default": 3,
                                         "maximum": 10,
-                                        "minimum": 0
+                                        "minimum": 0,
+                                        "example": 3
                                     },
                                     "retry_delay": {
+                                        "description": "Base delay in seconds between retry attempts (uses exponential backoff)",
                                         "type": "integer",
                                         "default": 60,
                                         "maximum": 3600,
-                                        "minimum": 5
+                                        "minimum": 5,
+                                        "example": 60
                                     }
                                 },
                                 "type": "object"
@@ -2337,10 +2450,53 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Webhook"
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Webhook created successfully"
+                                        },
+                                        "webhook": {
+                                            "$ref": "#/components/schemas/Webhook"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The events field is required."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "events": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The events field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2350,21 +2506,23 @@
                 ]
             }
         },
-        "/api/webhooks/{webhook}": {
+        "/api/v1/webhooks/{webhook}": {
             "get": {
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "Get webhook",
-                "description": "Get webhook details by ID",
-                "operationId": "575c5890c17e0f76b43772046d04a6e7",
+                "summary": "Get webhook details",
+                "description": "Retrieve detailed information about a specific webhook, including its configuration and the 10 most recent delivery attempts.",
+                "operationId": "c701adfcb1eea684dab0117e21e7b2fa",
                 "parameters": [
                     {
                         "name": "webhook",
                         "in": "path",
+                        "description": "Webhook ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
@@ -2374,10 +2532,78 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Webhook"
+                                    "properties": {
+                                        "webhook": {
+                                            "type": "object",
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/Webhook"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "deliveries": {
+                                                            "description": "10 most recent delivery attempts",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "event_type": {
+                                                                        "type": "string",
+                                                                        "example": "user.created"
+                                                                    },
+                                                                    "status": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "pending",
+                                                                            "success",
+                                                                            "failed"
+                                                                        ],
+                                                                        "example": "success"
+                                                                    },
+                                                                    "attempts": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "response_status": {
+                                                                        "type": "integer",
+                                                                        "example": 200,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "delivered_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "description": "Webhook not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2390,49 +2616,78 @@
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "Update webhook",
-                "description": "Update webhook configuration",
-                "operationId": "61710d3e239969f292f2abfcc34f1f94",
+                "summary": "Update webhook configuration",
+                "description": "Modify an existing webhook's settings. All fields are optional - only provided fields will be updated. The secret cannot be updated here - use the regenerate-secret endpoint instead.",
+                "operationId": "c09787b07a937e6d5f305994e2c24a53",
                 "parameters": [
                     {
                         "name": "webhook",
                         "in": "path",
+                        "description": "Webhook ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "requestBody": {
+                    "description": "Fields to update (all optional)",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "description": "Webhook name",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Updated Webhook Name"
                                     },
                                     "url": {
+                                        "description": "Endpoint URL",
                                         "type": "string",
-                                        "format": "url"
+                                        "format": "url",
+                                        "maxLength": 2048,
+                                        "example": "https://api.example.com/webhooks/new-endpoint"
                                     },
                                     "events": {
+                                        "description": "Event subscriptions",
                                         "type": "array",
                                         "items": {
                                             "type": "string"
-                                        }
+                                        },
+                                        "example": [
+                                            "user.created",
+                                            "user.deleted"
+                                        ]
                                     },
                                     "active": {
-                                        "type": "boolean"
+                                        "description": "Enable or disable webhook",
+                                        "type": "boolean",
+                                        "example": true
                                     },
                                     "headers": {
-                                        "type": "object"
+                                        "description": "Custom HTTP headers",
+                                        "type": "object",
+                                        "example": {
+                                            "X-API-Key": "new-key"
+                                        },
+                                        "nullable": true
                                     },
                                     "max_retries": {
-                                        "type": "integer"
+                                        "description": "Maximum retry attempts",
+                                        "type": "integer",
+                                        "maximum": 10,
+                                        "minimum": 0,
+                                        "example": 5
                                     },
                                     "retry_delay": {
-                                        "type": "integer"
+                                        "description": "Retry delay in seconds",
+                                        "type": "integer",
+                                        "maximum": 3600,
+                                        "minimum": 5,
+                                        "example": 120
                                     }
                                 },
                                 "type": "object"
@@ -2442,7 +2697,35 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Webhook updated successfully"
+                        "description": "Webhook updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Webhook updated successfully"
+                                        },
+                                        "webhook": {
+                                            "$ref": "#/components/schemas/Webhook"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Webhook not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2456,21 +2739,45 @@
                     "Webhooks"
                 ],
                 "summary": "Delete webhook",
-                "description": "Delete a webhook endpoint",
-                "operationId": "efe718f3bf61e800d3b188bdf6d1d536",
+                "description": "Permanently delete a webhook endpoint. This action cannot be undone. All associated delivery history will also be deleted.",
+                "operationId": "a1b387905a57c26131d3cb82d6ae6d9f",
                 "parameters": [
                     {
                         "name": "webhook",
                         "in": "path",
+                        "description": "Webhook ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Webhook deleted successfully"
+                        "description": "Webhook deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Webhook deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Webhook not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2480,27 +2787,56 @@
                 ]
             }
         },
-        "/api/webhooks/{webhook}/test": {
+        "/api/v1/webhooks/{webhook}/test": {
             "post": {
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "Test webhook",
-                "description": "Send a test payload to webhook endpoint",
-                "operationId": "428d0308dc9f7a73e992ef35fdef6b08",
+                "summary": "Send test webhook",
+                "description": "Trigger a test webhook delivery with a 'webhook.test' event. This allows you to verify your endpoint is correctly configured to receive and process webhooks. The delivery is queued and processed asynchronously.",
+                "operationId": "0a69b383ca2a68c2ad992f7a7388e5a4",
                 "parameters": [
                     {
                         "name": "webhook",
                         "in": "path",
+                        "description": "Webhook ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Test webhook sent"
+                        "description": "Test webhook queued successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Test webhook sent"
+                                        },
+                                        "delivery_id": {
+                                            "description": "ID of the created delivery record",
+                                            "type": "integer",
+                                            "example": 123
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Webhook not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2510,27 +2846,172 @@
                 ]
             }
         },
-        "/api/webhooks/{webhook}/deliveries": {
+        "/api/v1/webhooks/{webhook}/deliveries": {
             "get": {
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "Get webhook deliveries",
-                "description": "Get delivery history for a webhook",
-                "operationId": "54fddb85629876cf875ced51c2eaf877",
+                "summary": "Get webhook delivery history",
+                "description": "Retrieve a paginated list of all delivery attempts for a specific webhook, including status, response details, and error messages. Useful for debugging and monitoring webhook reliability.",
+                "operationId": "4ec6aee82f149893153e1282ab642e09",
                 "parameters": [
                     {
                         "name": "webhook",
                         "in": "path",
+                        "description": "Webhook ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page (default: 20)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "example": 20
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Field to sort by (default: created_at)",
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "example": "created_at"
+                        }
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc, default: desc)",
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "example": "desc"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Deliveries retrieved successfully"
+                        "description": "Deliveries retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "webhook_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "event_type": {
+                                                        "type": "string",
+                                                        "example": "user.created"
+                                                    },
+                                                    "payload": {
+                                                        "description": "Event payload sent to webhook",
+                                                        "type": "object"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "pending",
+                                                            "success",
+                                                            "failed"
+                                                        ],
+                                                        "example": "success"
+                                                    },
+                                                    "attempts": {
+                                                        "description": "Number of delivery attempts",
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "response_status": {
+                                                        "description": "HTTP response code",
+                                                        "type": "integer",
+                                                        "example": 200,
+                                                        "nullable": true
+                                                    },
+                                                    "response_body": {
+                                                        "description": "Response body from endpoint",
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "error_message": {
+                                                        "description": "Error message if failed",
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "delivered_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "nullable": true
+                                                    },
+                                                    "next_retry_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "nullable": true
+                                                    },
+                                                    "signature": {
+                                                        "description": "HMAC signature sent with request",
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "path": {
+                                            "type": "string"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "next_cursor": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "prev_cursor": {
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Webhook not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2540,17 +3021,53 @@
                 ]
             }
         },
-        "/api/webhooks/events": {
+        "/api/v1/webhooks/events": {
             "get": {
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "Get available events",
-                "description": "Get list of available webhook events",
-                "operationId": "4d6beddacc239a83d95602b86e825dd2",
+                "summary": "List available webhook events",
+                "description": "Retrieve a complete list of all webhook event types available in the system, along with their descriptions. Use these event names when creating or updating webhooks.",
+                "operationId": "4d8987200093bc2366d7352d2415d13d",
                 "responses": {
                     "200": {
-                        "description": "Events retrieved successfully"
+                        "description": "Events retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "events": {
+                                            "description": "Map of event names to descriptions",
+                                            "type": "object",
+                                            "example": {
+                                                "user.created": "User account created",
+                                                "user.updated": "User profile updated",
+                                                "user.deleted": "User account deleted",
+                                                "user.login": "User logged in",
+                                                "user.logout": "User logged out",
+                                                "user.email_verified": "User email verified",
+                                                "user.2fa_enabled": "Two-factor authentication enabled",
+                                                "user.2fa_disabled": "Two-factor authentication disabled",
+                                                "tenant.created": "New tenant created",
+                                                "tenant.updated": "Tenant updated",
+                                                "tenant.deleted": "Tenant deleted",
+                                                "webhook.test": "Test webhook event",
+                                                "gdpr.export_completed": "GDPR data export completed",
+                                                "gdpr.deletion_requested": "GDPR account deletion requested",
+                                                "gdpr.deletion_completed": "GDPR account deletion completed"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [
@@ -2560,27 +3077,56 @@
                 ]
             }
         },
-        "/api/webhooks/{webhook}/regenerate-secret": {
+        "/api/v1/webhooks/{webhook}/regenerate-secret": {
             "post": {
                 "tags": [
                     "Webhooks"
                 ],
-                "summary": "Regenerate webhook secret",
-                "description": "Generate a new HMAC secret for webhook",
-                "operationId": "15971d9a8b57045254dda69cbb916296",
+                "summary": "Regenerate webhook HMAC secret",
+                "description": "Generate a new random HMAC secret key for webhook signature verification. This immediately invalidates the old secret - make sure to update your endpoint to use the new secret before the next webhook is delivered. The new secret is returned in the response.",
+                "operationId": "ce01737f618a3e43f3b7cc236b45d036",
                 "parameters": [
                     {
                         "name": "webhook",
                         "in": "path",
+                        "description": "Webhook ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Secret regenerated successfully"
+                        "description": "Secret regenerated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Webhook secret regenerated successfully"
+                                        },
+                                        "secret": {
+                                            "description": "The new HMAC secret (store this securely)",
+                                            "type": "string",
+                                            "example": "XoCJuTjapNOD1YwPZVASiPLc2uAGbdxH"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Webhook not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing webhooks.manage permission"
                     }
                 },
                 "security": [

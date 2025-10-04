@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Tenants\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
 
@@ -33,9 +34,13 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'name.required' => 'Name is required',
             'email.required' => 'Email address is required',
             'email.email' => 'Please enter a valid email address',
+            'email.unique' => 'This email address is already registered',
             'password.required' => 'Password is required',
+            'password.min' => 'Password must be at least 8 characters',
+            'password.confirmed' => 'Password confirmation does not match',
         ];
     }
 }

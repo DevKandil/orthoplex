@@ -29,7 +29,7 @@ up:
 # Stop development environment
 down:
 	@echo "🛑 Stopping Orthoplex development environment..."
-	docker-compose down
+	docker compose down
 
 # Setup application
 setup:

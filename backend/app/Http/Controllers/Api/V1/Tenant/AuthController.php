@@ -26,8 +26,8 @@ use App\Http\Controllers\Controller;
  *     bearerFormat="JWT"
  * )
  */
-use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Tenants\Auth\LoginRequest;
+use App\Http\Requests\Tenants\Auth\RegisterRequest;
 use App\Models\User;
 use App\Models\LoginEvent;
 use App\Notifications\VerifyEmailNotification;

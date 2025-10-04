@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CanBeFiltered;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Webhook extends Model
 {
+    use CanBeFiltered;
     protected $fillable = [
         'name',
         'url',
