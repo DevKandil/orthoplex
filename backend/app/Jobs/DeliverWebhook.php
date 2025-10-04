@@ -15,7 +15,7 @@ class DeliverWebhook implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 1; // We handle retries manually
+    public int $tries = 1;
     public int $timeout = 60;
 
     /**
@@ -23,10 +23,7 @@ class DeliverWebhook implements ShouldQueue
      */
     public function __construct(
         public WebhookDelivery $delivery
-    ) {
-        // Set queue priority based on webhook event type
-        $this->onQueue($this->getQueueForEvent($delivery->event_type));
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -64,27 +61,5 @@ class DeliverWebhook implements ShouldQueue
             'status' => 'failed',
             'error_message' => 'Job failed permanently: ' . $exception->getMessage(),
         ]);
-    }
-
-    /**
-     * Get queue name based on event type.
-     */
-    private function getQueueForEvent(string $eventType): string
-    {
-        // High priority events
-        $highPriority = ['user.login', 'user.logout', 'webhook.test'];
-
-        // Low priority events
-        $lowPriority = ['gdpr.export_completed', 'tenant.updated'];
-
-        if (in_array($eventType, $highPriority)) {
-            return 'webhooks-high';
-        }
-
-        if (in_array($eventType, $lowPriority)) {
-            return 'webhooks-low';
-        }
-
-        return 'webhooks';
     }
 }
