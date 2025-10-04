@@ -58,7 +58,7 @@ A comprehensive Laravel 12 multi-tenant SaaS platform showcasing enterprise-grad
 ### 1. Clone Repository
 
 ```bash
-git clone <repository-url> orthoplex
+git clone git@github.com:DevKandil/orthoplex.git
 cd orthoplex
 ```
 
@@ -98,14 +98,14 @@ make migrate
 ## 🛠️ Development Commands
 
 ```bash
+# Setup application
+make setup
+
 # Start environment
 make up
 
 # Stop environment
 make down
-
-# Setup application
-make setup
 
 # Run database migrations
 make migrate
@@ -199,30 +199,30 @@ Tenants are automatically configured with:
 ### Authentication Endpoints
 
 ```http
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/logout
-POST /api/auth/refresh
-GET  /api/auth/me
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+POST /api/v1/auth/logout
+POST /api/v1/auth/refresh
+GET  /api/v1/auth/me
 ```
 
 ### User Management
 
 ```http
-GET    /api/users                 # List users (paginated)
-POST   /api/users                 # Create user
-GET    /api/users/{id}            # Get user
-PUT    /api/users/{id}            # Update user
-DELETE /api/users/{id}            # Soft delete user
-POST   /api/users/{id}/restore    # Restore user
+GET    /api/v1/users                 # List users (paginated)
+POST   /api/v1/users                 # Create user
+GET    /api/v1/users/{id}            # Get user
+PUT    /api/v1/users/{id}            # Update user
+DELETE /api/v1/users/{id}            # Soft delete user
+POST   /api/v1/users/{id}/restore    # Restore user
 ```
 
 ### Analytics
 
 ```http
-GET /api/users/top-logins?window=7d
-GET /api/users/inactive?window=week
-GET /api/analytics/login-stats
+GET /api/v1/users/top-logins?window=7d
+GET /api/v1/users/inactive?window=week
+GET /api/v1/analytics/login-stats
 ```
 
 ### Full API documentation available at `/api/documentation` when running.
@@ -257,7 +257,6 @@ docker-compose exec backend php artisan test --coverage
 - **`spatie/laravel-permission`**: Industry standard for RBAC implementation
 - **`pragmarx/google2fa-laravel`**: Reliable 2FA with good documentation
 - **`laravel/horizon`**: Official Redis queue monitoring and management
-- **`spatie/laravel-query-builder`**: Powerful API filtering and sorting
 - **`darkaonline/l5-swagger`**: OpenAPI documentation generation
 
 ### Architecture Decisions
@@ -287,41 +286,3 @@ docker-compose exec backend php artisan test --coverage
 - **Optimistic Locking**: Prevents race conditions in updates
 - **Cursor Pagination**: Efficient pagination for large datasets
 - **Eager Loading**: Prevent N+1 queries with proper relationships
-
-## 🚀 Production Deployment
-
-### Environment Setup
-
-1. Configure production environment variables
-2. Set up SSL certificates for multi-domain setup
-3. Configure Redis for caching and queues
-4. Set up queue workers with Supervisor
-5. Configure log rotation and monitoring
-
-### Scaling Considerations
-
-- **Database Sharding**: Can distribute tenants across multiple DB servers
-- **Cache Strategy**: Redis clustering for high availability
-- **Queue Workers**: Scale horizontally based on load
-- **CDN Integration**: For static assets and file uploads
-- **Load Balancing**: Multiple application servers behind load balancer
-
-## 📝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Run tests (`make test`)
-4. Format code (`make lint`)
-5. Commit changes (`git commit -m 'Add amazing feature'`)
-6. Push to branch (`git push origin feature/amazing-feature`)
-7. Open Pull Request
-
-## 🤝 Support
-
-- **Documentation**: Full API docs at `/api/documentation`
-- **Issues**: Use GitHub Issues for bug reports
-- **Discussions**: Use GitHub Discussions for questions
-
----
-
-**Built with ❤️ using Laravel 12, showcasing modern PHP development practices and enterprise-grade architecture.**
